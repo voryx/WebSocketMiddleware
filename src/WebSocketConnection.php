@@ -24,7 +24,6 @@ class WebSocketConnection implements EventEmitterInterface
         $mb = new MessageBuffer(
             new CloseFrameChecker(),
             function (Message $message) {
-                echo "Got " . $message->getPayload() . "\n";
                 $this->emit('message', [$message, $this]);
             },
             function (Frame $frame) {
