@@ -1,0 +1,11 @@
+{
+    "require": {
+        "ratchet/rfc6455": "^0.2.3",
+        "react/http": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Voryx\\WebSocketMiddleware\\": "src/"
+        }
+    }
+}
