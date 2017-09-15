@@ -1,4 +1,26 @@
 {
+    "name": "voryx/websocketmiddleware",
+    "type": "library",
+    "description": "WebSocket Middleware for React",
+    "keywords": [
+        "websocket",
+        "ws",
+        "server",
+        "websocket server"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Dan",
+            "email": "davidwdan@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Matt Bonneau",
+            "email": "matt@bonneau.net",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "ratchet/rfc6455": "^0.2.3",
         "react/http": "dev-master"
