@@ -37,6 +37,8 @@ class WebSocketConnection implements EventEmitterInterface
                             list($closeCode) = array_merge(unpack('n*', substr($frame->getPayload(), 0, 2)));
                         }
 
+                        $this->stream->end($frame->getContents());
+
                         if ($closeCode >= 2000) {
                             // emit close code as error
                             $exception = new \Exception('WebSocket closed with code ' . $closeCode);
@@ -46,7 +48,6 @@ class WebSocketConnection implements EventEmitterInterface
 
                         $this->emit('close', [$closeCode, $this]);
 
-                        $this->stream->close();
                         return;
                 }
             },

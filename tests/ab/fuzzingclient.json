@@ -1,0 +1,12 @@
+{
+    "options": {"failByDrop": false}
+  , "outdir": "reports"
+
+  , "servers": [
+        {"agent": "WebSocketMiddleware", "url": "ws://localhost:4321", "options": {"version": 18}}
+    ]
+
+  , "cases": ["*"]
+  , "exclude-cases": ["10.*", "11.*", "12.*", "13.*"]
+  , "exclude-agent-cases": {}
+}
