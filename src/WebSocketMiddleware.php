@@ -13,11 +13,13 @@ final class WebSocketMiddleware
 {
     private $paths;
     private $connectionHandler = null;
+    private $subProtocols;
 
-    public function __construct(array $paths = [], callable $connectionHandler = null)
+    public function __construct(array $paths = [], callable $connectionHandler = null, array $subProtocols = [])
     {
         $this->paths             = $paths;
         $this->connectionHandler = $connectionHandler ?: function () {};
+        $this->subProtocols      = $subProtocols;
     }
 
     public function __invoke(ServerRequestInterface $request, callable $next)
@@ -30,6 +32,8 @@ final class WebSocketMiddleware
         }
 
         $negotiator = new ServerNegotiator(new RequestVerifier());
+        $negotiator->setSupportedSubProtocols($this->subProtocols);
+        $negotiator->setStrictSubProtocolCheck(true);
 
         $response = $negotiator->handshake($request);
 
