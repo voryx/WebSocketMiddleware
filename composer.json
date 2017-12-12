@@ -23,7 +23,7 @@
     ],
     "require": {
         "ratchet/rfc6455": "^0.2.3",
-        "react/http": "dev-master"
+        "react/http": "^0.8"
     },
     "autoload": {
         "psr-4": {
