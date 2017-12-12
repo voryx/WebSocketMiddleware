@@ -22,7 +22,7 @@ $ws = new WebSocketMiddleware([], function (WebSocketConnection $conn) {
     });
 });
 
-$server = new Server(new MiddlewareRunner([$ws]));
+$server = new Server([$ws]);
 
 $server->listen(new \React\Socket\Server('127.0.0.1:4321', $loop));
 

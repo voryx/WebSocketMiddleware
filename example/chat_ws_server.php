@@ -4,7 +4,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\RFC6455\Messaging\Message;
 use React\EventLoop\Factory;
-use React\Http\MiddlewareRunner;
 use React\Http\Response;
 use React\Http\Server;
 use React\Stream\ThroughStream;
@@ -52,7 +51,7 @@ $ws = new WebSocketMiddleware(['/ws'], function (WebSocketConnection $conn, Serv
     $user++;
 });
 
-$server = new Server(new MiddlewareRunner([
+$server = new Server([
     function (ServerRequestInterface $request, callable $next) use ($broadcast) {
         // lets let the people chatting see what requests are happening too.
         $broadcast->write('<i>Request: ' . $request->getUri()->getPath() . '</i>');
@@ -66,7 +65,7 @@ $server = new Server(new MiddlewareRunner([
     function (ServerRequestInterface $request, callable $next) use ($frontend) {
         return new Response(200, [], $frontend);
     },
-]));
+]);
 
 $server->listen(new \React\Socket\Server('127.0.0.1:4321', $loop));
 
