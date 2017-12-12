@@ -15,6 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $loop = Factory::create();
 
 $frontend = file_get_contents(__DIR__ . '/test.html');
+$uri      = '127.0.0.1:4321';
 
 $broadcast = new ThroughStream();
 
@@ -69,4 +70,28 @@ $server = new Server([
 
 $server->listen(new \React\Socket\Server('127.0.0.1:4321', $loop));
 
+openWebPage($loop, 'http://' . $uri);
+
 $loop->run();
+
+function openWebPage($loop, $url)
+{
+    $os = strtolower(php_uname(PHP_OS));
+
+    if (strpos($os, 'darwin') !== false) {
+        $open = 'open';
+    } elseif (strpos($os, 'linux') !== false) {
+        $open = 'xdg-open';
+    } else {
+        echo "Can't open your browser, you'll have to manually navigate to {$url}", PHP_EOL;
+        return;
+    }
+
+    $process = new React\ChildProcess\Process("{$open} {$url}");
+
+    try {
+        $process->start($loop);
+    } catch (Exception $e) {
+        echo $e->getMessage(), PHP_EOL;
+    }
+}
