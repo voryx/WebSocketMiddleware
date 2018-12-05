@@ -66,8 +66,8 @@ class WebSocketConnection implements EventEmitterInterface
         $this->stream->write($data->getContents());
     }
 
-    public function close()
+    public function close($code = 1000, $reason = '')
     {
-        $this->stream->end((new Frame(pack('n', 1000), true, Frame::OP_CLOSE))->getContents());
+        $this->stream->end((new Frame(pack('n', $code) . $reason, true, Frame::OP_CLOSE))->getContents());
     }
 }
