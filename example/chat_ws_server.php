@@ -63,7 +63,7 @@ $server = new Server([
         $request = $request->withHeader('Request-Time', time());
         return $next($request);
     },
-    function (ServerRequestInterface $request, callable $next) use ($frontend) {
+    function (ServerRequestInterface $request) use ($frontend) {
         return new Response(200, [], $frontend);
     },
 ]);
