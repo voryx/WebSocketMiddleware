@@ -3,6 +3,7 @@
 namespace Voryx\WebSocketMiddleware;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Ratchet\RFC6455\Handshake\NegotiatorInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
 use React\Http\Response;
@@ -16,7 +17,7 @@ final class WebSocketMiddleware
     private $subProtocols;
     private $negotiator;
 
-    public function __construct(array $paths = [], callable $connectionHandler = null, array $subProtocols = [], $negotiator = null)
+    public function __construct(array $paths = [], callable $connectionHandler = null, array $subProtocols = [], NegotiatorInterface $negotiator = null)
     {
         $this->paths             = $paths;
         $this->connectionHandler = $connectionHandler ?: function () {};
