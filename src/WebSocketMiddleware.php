@@ -12,14 +12,23 @@ use React\Stream\ThroughStream;
 final class WebSocketMiddleware
 {
     private $paths;
-    private $connectionHandler = null;
+    private $connectionHandler;
     private $subProtocols;
+    private $negotiator;
 
-    public function __construct(array $paths = [], callable $connectionHandler = null, array $subProtocols = [])
+    public function __construct(array $paths = [], callable $connectionHandler = null, array $subProtocols = [], $negotiator = null)
     {
         $this->paths             = $paths;
         $this->connectionHandler = $connectionHandler ?: function () {};
         $this->subProtocols      = $subProtocols;
+
+        if ($negotiator === null) {
+            $negotiator = new ServerNegotiator(new RequestVerifier());
+            $negotiator->setSupportedSubProtocols($this->subProtocols);
+            $negotiator->setStrictSubProtocolCheck(true);
+        }
+
+        $this->negotiator = $negotiator;
     }
 
     public function __invoke(ServerRequestInterface $request, callable $next)
@@ -31,11 +40,7 @@ final class WebSocketMiddleware
             }
         }
 
-        $negotiator = new ServerNegotiator(new RequestVerifier());
-        $negotiator->setSupportedSubProtocols($this->subProtocols);
-        $negotiator->setStrictSubProtocolCheck(true);
-
-        $response = $negotiator->handshake($request);
+        $response = $this->negotiator->handshake($request);
 
         if ($response->getStatusCode() != '101') {
             // TODO: this should return an error or something not continue the chain

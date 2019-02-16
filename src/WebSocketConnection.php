@@ -32,21 +32,17 @@ class WebSocketConnection implements EventEmitterInterface
                         $this->stream->write((new Frame($frame->getPayload(), true, Frame::OP_PONG))->getContents());
                         return;
                     case Frame::OP_CLOSE:
-                        $closeCode = 1000;
-                        if ($frame->getPayloadLength() >= 2) {
-                            list($closeCode) = array_merge(unpack('n*', substr($frame->getPayload(), 0, 2)));
+                        $closeCode = unpack('n*', substr($frame->getPayload(), 0, 2));
+                        $closeCode = reset($closeCode) ?: 1000;
+                        $reason = '';
+
+                        if ($frame->getPayloadLength() > 2) {
+                            $reason = substr($frame->getPayload(), 2);
                         }
 
                         $this->stream->end($frame->getContents());
 
-                        if ($closeCode >= 2000) {
-                            // emit close code as error
-                            $exception = new \Exception('WebSocket closed with code ' . $closeCode);
-                            $this->emit('error', [$exception, $this]);
-                            return;
-                        }
-
-                        $this->emit('close', [$closeCode, $this]);
+                        $this->emit('close', [$closeCode, $reason, $this]);
 
                         return;
                 }
