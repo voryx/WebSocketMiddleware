@@ -15,7 +15,7 @@ class WebSocketConnection implements EventEmitterInterface
 {
     use EventEmitterTrait;
 
-    private $stream;
+    protected $stream;
 
     public function __construct(DuplexStreamInterface $stream)
     {
@@ -64,5 +64,15 @@ class WebSocketConnection implements EventEmitterInterface
     public function close($code = 1000, $reason = '')
     {
         $this->stream->end((new Frame(pack('n', $code) . $reason, true, Frame::OP_CLOSE))->getContents());
+    }
+
+    public function getStream()
+    {
+        return $this->stream;
+    }
+
+    public function isReady()
+    {
+        return $this->stream->isWritable();
     }
 }
