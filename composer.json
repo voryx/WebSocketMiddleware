@@ -22,11 +22,11 @@
         }
     ],
     "require": {
-        "ratchet/rfc6455": "^0.2.3",
-        "react/http": "^0.8"
+        "ratchet/rfc6455": "^0.3",
+        "react/http": "^1.0"
     },
     "require-dev":{
-        "react/child-process": "^0.5.0"
+        "react/child-process": "^0.6"
     },
     "autoload": {
         "psr-4": {
