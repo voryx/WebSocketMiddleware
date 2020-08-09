@@ -5,7 +5,7 @@ namespace Voryx\WebSocketMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
-use React\Http\Response;
+use React\Http\Message\Response;
 use React\Stream\CompositeStream;
 use React\Stream\ThroughStream;
 
@@ -22,11 +22,15 @@ final class WebSocketMiddleware
         $this->subProtocols      = $subProtocols;
     }
 
-    public function __invoke(ServerRequestInterface $request, callable $next)
+    public function __invoke(ServerRequestInterface $request, callable $next = null)
     {
         // check path at some point - for now we just go go ws
         if (count($this->paths) > 0) {
             if (!in_array($request->getUri()->getPath(), $this->paths)) {
+                if ($next === null) {
+                    return new Response(404);
+                }
+
                 return $next($request);
             }
         }
@@ -38,6 +42,10 @@ final class WebSocketMiddleware
         $response = $negotiator->handshake($request);
 
         if ($response->getStatusCode() != '101') {
+            if ($next === null) {
+                return new Response(404);
+            }
+
             // TODO: this should return an error or something not continue the chain
             return $next($request);
         }
