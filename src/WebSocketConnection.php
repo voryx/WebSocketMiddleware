@@ -4,6 +4,7 @@ namespace Voryx\WebSocketMiddleware;
 
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
+use Ratchet\RFC6455\Handshake\PermessageDeflateOptions;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\Message;
@@ -17,9 +18,19 @@ class WebSocketConnection implements EventEmitterInterface
 
     private $stream;
 
-    public function __construct(DuplexStreamInterface $stream)
+    /** @var WebSocketOptions */
+    private $webSocketOptions;
+
+    /** @var PermessageDeflateOptions */
+    private $permessageDeflateOptions;
+
+    private $messageBuffer;
+
+    public function __construct(DuplexStreamInterface $stream, WebSocketOptions $webSocketOptions, PermessageDeflateOptions $permessageDeflateOptions)
     {
-        $this->stream = $stream;
+        $this->stream                   = $stream;
+        $this->webSocketOptions         = $webSocketOptions;
+        $this->permessageDeflateOptions = $permessageDeflateOptions;
 
         $mb = new MessageBuffer(
             new CloseFrameChecker(),
@@ -46,19 +57,32 @@ class WebSocketConnection implements EventEmitterInterface
                         return;
                 }
             },
-            true
+            true,
+            null,
+            $this->webSocketOptions->getMaxMessagePayloadSize(),
+            $this->webSocketOptions->getMaxFramePayloadSize(),
+            [$this->stream, 'write'],
+            $this->permessageDeflateOptions
         );
+
+        $this->messageBuffer = $mb;
 
         $stream->on('data', [$mb, 'onData']);
     }
 
     public function send($data)
     {
-        if (!($data instanceof MessageInterface)) {
-            $data = new Frame($data, true, Frame::OP_TEXT);
+        if ($data instanceof Frame) {
+            $this->messageBuffer->sendFrame($data);
+            return;
         }
 
-        $this->stream->write($data->getContents());
+        if ($data instanceof MessageInterface) {
+            $this->messageBuffer->sendMessage($data->getPayload(), true, $data->isBinary());
+            return;
+        }
+
+        $this->messageBuffer->sendMessage($data);
     }
 
     public function close($code = 1000, $reason = '')

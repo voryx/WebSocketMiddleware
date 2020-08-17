@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "ratchet/rfc6455": "^0.2.3",
+        "ratchet/rfc6455": "^0.3",
         "react/http": "^1.0"
     },
     "require-dev":{
