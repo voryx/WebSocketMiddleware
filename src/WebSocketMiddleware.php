@@ -60,6 +60,12 @@ final class WebSocketMiddleware
             return new Response(500, [], 'Error negotiating websocket permessage-deflate: ' . $e->getMessage());
         }
 
+        if (!$this->webSocketOptions->isPermessageDeflateEnabled()) {
+            $permessageDeflateOptions = [
+                PermessageDeflateOptions::createDisabled()
+            ];
+        }
+
         $inStream  = new ThroughStream();
         $outStream = new ThroughStream();
 
