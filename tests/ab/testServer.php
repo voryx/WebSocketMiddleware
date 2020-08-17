@@ -14,11 +14,11 @@ $ws = new WebSocketMiddleware([], function (WebSocketConnection $conn) {
     $conn->on('message', function (Message $message) use ($conn) {
         $conn->send($message);
     });
-});
+}, [], \Voryx\WebSocketMiddleware\WebSocketOptions::getDefault()->withPermessageDeflate());
 
 $server = new Server($loop, $ws);
 
-$server->listen(new \React\Socket\Server('127.0.0.1:4321', $loop));
+$server->listen(new \React\Socket\Server('0.0.0.0:4321', $loop));
 
 $loop->run();
 
